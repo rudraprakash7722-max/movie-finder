@@ -8,7 +8,6 @@
 
   const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
 
-  console.log("API_KEY", API_KEY);
 
   async function fetchMovies(searchTerm) {
     const response = await fetch(`https://www.omdbapi.com/?s=${searchTerm}&apikey=${API_KEY}`);
