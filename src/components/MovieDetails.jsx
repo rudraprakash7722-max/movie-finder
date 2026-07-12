@@ -8,6 +8,7 @@ function MovieDetails() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const { imdbID } = useParams();
+    console.log("MovieDetails component rendered with imdbID:", imdbID);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -61,6 +62,7 @@ function MovieDetails() {
     }
 
     if (error) {
+        console.error("Error fetching movie details:", error);
         return <p>{error}</p>;
     }
 

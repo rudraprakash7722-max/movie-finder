@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 function MovieCard({ data }) {
     const hasPoster = data.Poster && data.Poster !== "N/A";
     const navigate = useNavigate();
+    console.log("MovieCard component rendered with data:", data);
     return (
         <div className="movie-card" onClick={()=>{
-            navigate(`/movie/${data.imdbID}`);
+            navigate(`/movie-finder/movie/${data.imdbID}`);
         }}>
             <div className="movie-poster">
                 {hasPoster ? (
