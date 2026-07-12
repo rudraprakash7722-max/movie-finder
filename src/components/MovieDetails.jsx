@@ -1,5 +1,70 @@
-function MovieDetails({ movie }) {
-oster && movie.Poster !== "N/A";
+import {useEffect, useState} from "react";
+import {useParams,useNavigate} from "react-router-dom";
+import Loader from "./Loader";
+
+function MovieDetails() {
+    const [movie, setMovie] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const { imdbID } = useParams();
+
+    useEffect(() => {
+        const controller = new AbortController();
+
+        async function fetchMovieDetails() {
+            try {
+                setLoading(true);
+                setError("");
+                setMovie(null);
+
+                const response = await fetch(
+                    `https://www.omdbapi.com/?i=${imdbID}&apikey=${import.meta.env.VITE_OMDB_API_KEY}`,
+                    { signal: controller.signal }
+                );
+                const data = await response.json();
+
+                if (!response.ok || data.Response === "False") {
+                    throw new Error(data.Error || "Failed to fetch movie details.");
+                }
+
+                setMovie(data);
+            } catch (error) {
+                if (error.name === "AbortError") {
+                    return;
+                }
+
+                setMovie(null);
+                setError(error.message || "Failed to fetch movie details.");
+            } finally {
+                if (!controller.signal.aborted) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        if (imdbID) {
+            fetchMovieDetails();
+        } else {
+            setMovie(null);
+            setError("Movie not found.");
+            setLoading(false);
+        }
+
+        return () => {
+            controller.abort();
+        };
+    }, [imdbID]);
+
+    if (loading) {
+        return <Loader />;
+    }
+
+    if (error) {
+        return <p>{error}</p>;
+    }
+
+    const hasPoster = movie.Poster && movie.Poster !== "N/A";
     const has = (field) => field && field !== "N/A";
 
     return (
@@ -306,11 +371,15 @@ oster && movie.Poster !== "N/A";
                                 <span className="md-meta-value md-mono">{movie.imdbID}</span>
                             </div>
                         )}
+                    <div>
+                            <button onClick={() => navigate(-1)} style={{ marginTop: '20px', padding: '8px 16px', borderRadius: '4px', backgroundColor: '#e3a857', color: '#1a1305', border: 'none', cursor: 'pointer' }}>
+                            Go Back</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </article>
-    )
+    );
 }
 
 export default MovieDetails;

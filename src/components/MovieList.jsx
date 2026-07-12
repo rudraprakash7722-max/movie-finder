@@ -1,7 +1,7 @@
 import MovieCard from "./MovieCard";
 import Loader from "./Loader";
 
-function MovieList({ movies, loading, error, setSelectedMovie }) {
+function MovieList({ movies, loading, error }) {
     if (loading) {
         return <Loader />;
     }

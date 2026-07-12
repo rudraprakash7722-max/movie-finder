@@ -1,5 +1,4 @@
-import { useNavigate,useParams } from "react-router-dom";
-import {useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 
 function MovieCard({ data }) {
     const hasPoster = data.Poster && data.Poster !== "N/A";

@@ -1,7 +1,6 @@
     import Navbar from './components/Navbar';
     import SearchBar from './components/SearchBar';
     import MovieList from './components/MovieList';
-    import {useNavigate} from "react-router-dom";
     import { Route,Routes } from 'react-router-dom';
     import Error from './components/Error';
     import {useState,useEffect} from 'react';
@@ -10,10 +9,10 @@
     const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
 
 
-    async function fetchMovies(searchTerm) {
-      const response = await fetch(`https://www.omdbapi.com/?s=${searchTerm}&apikey=${API_KEY}`);
+    async function fetchMovies(searchTerm, signal) {
+      const response = await fetch(`https://www.omdbapi.com/?s=${searchTerm}&apikey=${API_KEY}`, { signal });
       const data = await response.json();
-        if(data.Response === "False") {
+        if(!response.ok || data.Response === "False") {
           throw new Error(data.Error);
         }
       console.log("Fetched Movies:", data.Search);
@@ -35,27 +34,40 @@
       useEffect(()=>{
         if(searchTerm.trim() === ''){
           setMovies([]);
+          setError(null);
+          setLoading(false);
           return;
         }
+
+        const controller = new AbortController();
 
         async function loadMovies(){
           try {
             setLoading(true);
             setError(null);
-            const moviesData = await fetchMovies(searchTerm);
+            const moviesData = await fetchMovies(searchTerm, controller.signal);
             setMovies(moviesData);
           } catch (error) {
+            if (error.name === "AbortError") {
+              return;
+            }
+
+            setMovies([]);
             setError(error.message);
           } finally {
-            setLoading(false);
+            if (!controller.signal.aborted) {
+              setLoading(false);
+            }
           }
         }
 
         loadMovies();
 
-      },[searchTerm]);
+        return () => {
+          controller.abort();
+        };
 
-      const navigate = useNavigate();
+      },[searchTerm]);
 
 
       return (
