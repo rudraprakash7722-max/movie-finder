@@ -73,8 +73,8 @@
       return (
         <div className="app">
         <Routes>
-          <Route path="/movie/:imdbID" element={<MovieDetails />} />
-          <Route path="/" element={
+          <Route path="/movie-finder/movie/:imdbID" element={<MovieDetails />} />
+          <Route path="/movie-finder/" element={
             <>
               <Navbar />
               <main className="page-content">
