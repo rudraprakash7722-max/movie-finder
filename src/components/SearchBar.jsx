@@ -1,4 +1,4 @@
-function SearchBar({ searchTerm, setSearchTerm, handleSearch }) {
+function SearchBar({ searchTerm, setSearchTerm }) {
 
     return (
         <section className="search-section">
@@ -18,9 +18,7 @@ function SearchBar({ searchTerm, setSearchTerm, handleSearch }) {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
 
-                <button className="search-button" onClick={handleSearch}>
-                    Search
-                </button>
+              
             </div>
         </section>
     )

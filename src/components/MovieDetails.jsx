@@ -1,5 +1,5 @@
 function MovieDetails({ movie }) {
-    const hasPoster = movie.Poster && movie.Poster !== "N/A";
+oster && movie.Poster !== "N/A";
     const has = (field) => field && field !== "N/A";
 
     return (

@@ -1,10 +1,12 @@
-function MovieCard({ data, onMovieClick, setSelectedMovie }) {
-    const hasPoster = data.Poster && data.Poster !== "N/A";
+import { useNavigate,useParams } from "react-router-dom";
+import {useEffect} from "react";
 
+function MovieCard({ data }) {
+    const hasPoster = data.Poster && data.Poster !== "N/A";
+    const navigate = useNavigate();
     return (
         <div className="movie-card" onClick={()=>{
-            setSelectedMovie(data);
-            onMovieClick(data.imdbID);
+            navigate(`/movie/${data.imdbID}`);
         }}>
             <div className="movie-poster">
                 {hasPoster ? (

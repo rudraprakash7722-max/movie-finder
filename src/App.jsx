@@ -1,104 +1,86 @@
-  import Navbar from './components/Navbar';
-  import SearchBar from './components/SearchBar';
-  import MovieList from './components/MovieList';
-  import Loader from './components/Loader';
-  import Error from './components/Error';
-  import {useState} from 'react';
-  import MovieDetails from './components/MovieDetails';
+    import Navbar from './components/Navbar';
+    import SearchBar from './components/SearchBar';
+    import MovieList from './components/MovieList';
+    import {useNavigate} from "react-router-dom";
+    import { Route,Routes } from 'react-router-dom';
+    import Error from './components/Error';
+    import {useState,useEffect} from 'react';
+    import MovieDetails from './components/MovieDetails';
 
-  const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
-
-
-  async function fetchMovies(searchTerm) {
-    const response = await fetch(`https://www.omdbapi.com/?s=${searchTerm}&apikey=${API_KEY}`);
-    const data = await response.json();
-      if(data.Response === "False") {
-        throw new Error(data.Error);
-      }
-    console.log("Fetched Movies:", data.Search);
-    return data.Search;
-  }
+    const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
 
 
+    async function fetchMovies(searchTerm) {
+      const response = await fetch(`https://www.omdbapi.com/?s=${searchTerm}&apikey=${API_KEY}`);
+      const data = await response.json();
+        if(data.Response === "False") {
+          throw new Error(data.Error);
+        }
+      console.log("Fetched Movies:", data.Search);
+      return data.Search;
+    }
 
 
-  function App() {
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [movies, setMovies] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const  [error, setError] = useState(null);
-    const [selectedMovie, setSelectedMovie] = useState(null);
 
-    if (selectedMovie) {
+    function App() {
+
+      const [searchTerm, setSearchTerm] = useState('');
+      const [movies, setMovies] = useState([]);
+      const [loading, setLoading] = useState(false);
+      const  [error, setError] = useState(null);
+    
+
+
+      useEffect(()=>{
+        if(searchTerm.trim() === ''){
+          setMovies([]);
+          return;
+        }
+
+        async function loadMovies(){
+          try {
+            setLoading(true);
+            setError(null);
+            const moviesData = await fetchMovies(searchTerm);
+            setMovies(moviesData);
+          } catch (error) {
+            setError(error.message);
+          } finally {
+            setLoading(false);
+          }
+        }
+
+        loadMovies();
+
+      },[searchTerm]);
+
+      const navigate = useNavigate();
+
+
       return (
         <div className="app">
-          <Navbar />
-          <main className="page-content">
-            <div className="container">
-              <MovieDetails movie={selectedMovie} />
-              <button className="back-button" onClick={() => setSelectedMovie(null)}>Back to Search</button>
-            </div>
-          </main>
+        <Routes>
+          <Route path="/movie/:imdbID" element={<MovieDetails />} />
+          <Route path="/" element={
+            <>
+              <Navbar />
+              <main className="page-content">
+                <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                <div className="container">
+                  <MovieList movies={movies} loading={loading} error={error} />
+                </div>
+              </main>
+            </>
+          } />
+          <Route path="*" element={<Error />} />
+        </Routes>
+        
         </div>
       );
     }
 
 
-    
-    async function handleSearch() {
-            try{ 
-              setLoading(true);
-              setError(null);
 
-              let fetchedMovies = await fetchMovies(searchTerm);
-              if (fetchedMovies.length === 0) {
-                setError('No movies found');
-              } else {
-                setMovies(fetchedMovies);
-              }}
-              catch (error) {
-                setError(error.message);
-              }
-              finally {
-                setLoading(false);
-              }
-            }
-      
-      async function handleMovieClick(imdbID) {
-        try {
-          setLoading(true);
-          setError(null);
-          const response = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${API_KEY}`);
-          const data = await response.json();
-          setSelectedMovie(data);
 
-          if (data.Response === "False") {
-            throw new Error(data.Error);
-          }
-          console.log("Fetched Movie Details:", data);
-        
-        } catch (error) {
-          setError(error.message);
-        } finally {
-          setLoading(false);
-        }
-      }
-
-    
-
-    return (
-      <div className="app">
-        <Navbar />
-        <main className="page-content">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleSearch={handleSearch} />
-          <div className="container">
-            <MovieList movies={movies} loading={loading} error={error} handleMovieClick={handleMovieClick}
-            setSelectedMovie={setSelectedMovie} />
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  export default App;
+    export default App;

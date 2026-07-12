@@ -1,7 +1,7 @@
 import MovieCard from "./MovieCard";
 import Loader from "./Loader";
 
-function MovieList({ movies, loading, error, handleMovieClick, setSelectedMovie }) {
+function MovieList({ movies, loading, error, setSelectedMovie }) {
     if (loading) {
         return <Loader />;
     }
@@ -39,8 +39,7 @@ function MovieList({ movies, loading, error, handleMovieClick, setSelectedMovie 
     return (
         <div className="movie-list">
             {movies.map((movie) => (
-                <MovieCard key={movie.imdbID} data={movie}
-                  onMovieClick={handleMovieClick} setSelectedMovie={setSelectedMovie} />
+                <MovieCard key={movie.imdbID} data={movie} />
             ))}
         </div>
     )
